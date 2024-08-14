@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" ,="" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/favicon.gif" type="image/gif"/>
+     <meta name="application-name" content="snek">
+    <meta name="description" content="goofy ahh snake">
+    <title>Snek</title>
+    <link rel="stylesheet" href="snake.css">
+    <script src="snake.js"></script>
+  </head>
+  <body>
+    <div id="start" class="center">
+      <p id="escape"></p>
+      <h1 id="title">Snek</h1>
+      <button id="startgame" onclick="checkForMode()">Begin</button>
+      <button id="mode" onclick="switchMode()"><span>Normal</span></button>
+    </div>
+    <div id="thing1" style="display: none;">
+    <p id="score">Score: 0</p>
+    <p id="health">Health: 3</p>
+    <p id="bestscore" class="extra">Personal Best:0</p>
+    <p id="mult" class="extra">Multiplier: N/A</p>
+    <p id="room">Undefined</p>
+    <button id="gameover" onclick="restart()">
+    Play Again
+    </button>
+    <button id="cl" onclick="window.location.href='https://saith23.github.io/Snake/Changelog/changelog.html'">
+      Changelog
+      </button>
+      <button id="reset" onclick="localStorage.highScore = 0;">Reset Highscore</button>
+      <button onclick="extraInfo()" id="info">More Info</button>
+    </div>
+    <canvas id="board" height="700" width="600" style="display:none;"></canvas>
+<script>
+var mode = 1;
+localStorage.setItem('hasStarted', false);
+localStorage.setItem('mode', mode);
+setInterval(()=>{localStorage.mode = mode}, 10);
+function restart(){
+location.reload();
+}
+function start(){
+
+  document.getElementById('board').style.display = 'inline-block'
+document.getElementById('thing1').style.display = 'block'
+document.getElementById('start').style.display = 'none'
+localStorage.hasStarted = true;
+}
+function checkForMode(){
+if (mode == 1){
+start();
+} else if (mode == 2){
+  window.location.href='https://saith23.github.io/Snake/'
+}
+}
+function switchMode(){
+const f = document.getElementById('mode')
+if (mode == 1){
+mode = 2;
+f.innerHTML = 'Old'
+f.style.background = 'brown'
+console.log(mode)
+}else if (mode == 2){
+mode = 1;
+f.innerHTML = 'Normal'
+f.style.background = 'black'
+console.log(mode)
+}
+}
+function extraInfo() {
+const e = document.getElementsByClassName("extra");
+var k = document.getElementById("info");
+// Loop through all elements and hide/show them
+for (var i = 0; i < e.length; i++) {
+  if (e[i].style.display === "none" ) {
+    e[i].style.display = "block";
+    k.innerHTML = "Less Info"
+  } else {
+    e[i].style.display = "none";
+    k.innerHTML ="More Info"
+  }
+}
+}
+  </script>
+
+  </body>
+  <div id="vimeo-record-extension"></div>
+
+</html>
