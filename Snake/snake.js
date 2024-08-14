@@ -222,6 +222,8 @@ let grapePopped = false;
       context.fillRect(neutronX, neutronY, blockSize, blockSize)
       context.fillStyle = 'grey'
       context.fillRect(blackHoleX, blackHoleY, blockSize, blockSize)
+      context.fillStyle = "yellow"
+      context.fillRect(goldX, goldY, blockSize, blockSize)
       portalX = 0;
       portalY = 280;
       portalX2 = 580;
@@ -420,11 +422,6 @@ if (snakeX == Xpos && snakeY == Ypos && isTreasure && !isThorn && !isFakeTreasur
         snakeX = 560;
         snakeY = 280;
         alert("The fields are locked for now, please check in later.")
-    
-      velocityX = 0;
-      velocityY = 0;
-      snakeX = 20;
-      snakeY = 280;
       } else if (snakeX == portalX2 && snakeY == portalY2 && room == 1 && mazelocked == true){
         while(snakeBody.length > 0){
         snakeBody.pop()
@@ -499,7 +496,7 @@ if (snakeX == Xpos && snakeY == Ypos && isTreasure && !isThorn && !isFakeTreasur
         placePoison();
       }
     
-      if (snakeX == goldX && goldY == snakeY) {
+      if (snakeX == goldX && goldY == snakeY && room == 1) {
        goldThing();
       }
       const difference= Math.abs(blackHoleX-snakeX);
