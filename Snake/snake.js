@@ -21,7 +21,9 @@
     inner: '#c78f00',
     outer: '#a17300'
     }
-    const Epsilon = 8.362748564939345849255739375;
+    let escapeOn = false;
+    let deathReason = "";
+    const Epsilon = 21;
     let wallArray = [];
     let poisonX;
     let poisonY;
@@ -50,8 +52,11 @@ let miniGrapes = {
   threeY: 0,
   fourX: 0,
   fourY: 0,
+  oneAlive: false,
+ twoAlive: false,
+  threeAlive: false,
+  fourAlive: false,
 }
-let grapePopped = false;
     let hp = 3;
     const d = document;
     const gE = function(id){
@@ -106,7 +111,7 @@ let grapePopped = false;
       placeFood();
       placePoison();
       placeGrape();
-    setPortals();
+
     blackHole();
     setInterval(()=>{
     if(room == 1 && blackHoleX <= 500 && blackHoleX >= -500){
@@ -125,12 +130,13 @@ let grapePopped = false;
       setInterval(placeGold, 2000);
       d.addEventListener("keyup", changeDirection);
       setInterval(update, 950 / 10);
-      setInterval(updateButtons, 1000 / 100);
+      setInterval(updateHTML, 1000 / 100);
       setInterval(getHighScore, 1000/10);
       setInterval(updateHighScore, 1000/10);
       setInterval(updateHP, 1);
       setInterval(placeHP, 3000);
       }
+
       function sunCollision(sX, sY, objectX, objectY) {
         const objectSize = blockSize * 3;
         if (
@@ -139,7 +145,7 @@ let grapePopped = false;
           sY < objectY + objectSize &&
           sY + blockSize > objectY
         ) {
-          gE('escape').innerHTML = 'Get out <strong>NOW!</strong>'
+        escapeOn = true;
           sunColors.base = 'red'
           sunColors.inner = '#cf0000'
           sunColors.outer = '#9c0000'
@@ -147,8 +153,15 @@ let grapePopped = false;
           .then(()=>{
         if (room == 1){
         gameOver = true;
+        deathReason = "Didn't evacuate during sun explosion in time"
         } else {
-        gE('escape').innerHTML = ''
+        gE('escape').style.color = "green"
+        gE('escape').innerHTML = "You can now enter outer space."
+        escapeOn = false;
+        setTimeout(()=>{
+            gE('escape').style.color = "black"
+        gE('escape').innerHTML = "";
+        }, 7000)
         sunColors.base = 'yellow'
         sunColors.inner = '#c78f00',
         sunColors.outer = '#a17300'
@@ -156,14 +169,52 @@ let grapePopped = false;
         })
         }
       }
-    function updateButtons(){
-      if (gameOver === false){
-    gE("gameover").style.display = 'none';
-    } else {
-    gE("gameover").style.display = 'inline';
-    }
+
+    function updateHTML(){
+      if (!gameOver){
+        gE("gameover").style.display = 'none';
+    
+        } else if (gameOver){
+          gE("gameover").style.display = 'block';
+        document.getElementById('board').style.display = 'none'
+        document.getElementById('thing1').style.display = 'none'
+        } 
+        gE("reason").innerHTML = deathReason
+    let restart = gE("restartgame");
+    restart.addEventListener("click", ()=>{
+      gameOver = false;
+      hp = 3
+      gE("health").innerHTML = "Health: 3"
+    score = 0
+    gE("score").innerHTML = "Score: 0"
+    room = 0;
+    sunColors = {
+      base: 'yellow',
+      inner: '#c78f00',
+      outer: '#a17300'
+      }
+      snakeY = 40;
+        snakeX = 40;
+        velocityX = 0;
+        velocityY = 0;
+        gE("escape").innerHTML= ""
+      document.getElementById('board').style.display = 'inline-block'
+document.getElementById('thing1').style.display = 'block'
+gE("gameover").style.display = 'none';
+  console.log("game restarted")
+    })
     }
     function update() {
+      if (escapeOn){
+        if (room == 1){
+            gE('escape').innerHTML = 'Get out <strong>NOW!</strong>'
+             gE('escape').style.color = 'red'
+        } else {
+          gE('escape').innerHTML = 'Stay out of space until the sun cools down.'
+          gE('escape').style.color = 'yellow'
+      }
+      
+      }
       if (gameOver) {
         return;
       }
@@ -188,7 +239,7 @@ let grapePopped = false;
       if (hp <= 0){
         gameOver = true;
         hp = 3;
-        alert("Watch your lives.")
+       deathReason = "Out of lives"
       };
       if (room == 0){
       context.fillStyle = "black";
@@ -237,11 +288,14 @@ let grapePopped = false;
         context.fillRect(portalX2, portalY2, blockSize, blockSize); 
         context.fillStyle = "purple";
         context.fillRect(grapeX, grapeY, blockSize, blockSize);
+        context.fillStyle = '#131313';
+        context.fillRect(portalX, portalY, blockSize, blockSize); 
         portalX2 = 0;
         portalY2 = 280;
     snakecol = "blue"
     let wall = class{
     constructor(Xpos,Ypos, isTreasure, isThorn, isFakeTreasure){
+      
     if (!isNaN(Xpos) && !isNaN(Ypos)){
     if (isTreasure && !isThorn && !isFakeTreasure){
     context.fillStyle = 'yellow';
@@ -399,7 +453,7 @@ if (snakeX == Xpos && snakeY == Ypos && isTreasure && !isThorn && !isFakeTreasur
       snakeX = 20;
       snakeY = 280;
       }
-       else if (snakeX == portalX && snakeY == portalY && room == 1){
+       if (snakeX == portalX && snakeY == portalY && room == 1){
         room = 0;
         while(snakeBody.length > 0){
         snakeBody.pop()
@@ -410,10 +464,14 @@ if (snakeX == Xpos && snakeY == Ypos && isTreasure && !isThorn && !isFakeTreasur
       snakeX = 560;
       snakeY = 280;
       }
-      else if (snakeX == portalX2 && snakeY == portalY2 && room == 1 && mazelocked == false){
+       if (snakeX == portalX2 && snakeY == portalY2 && room == 1 && mazelocked == false){
        /* room = 2;
         while(snakeBody.length > 0){
-        snakeBody.pop()} */
+        snakeBody.pop()} 
+        velocityX = 0;
+        velocityY = 0;
+        snakeX = 20;
+        snakeY = 280;*/
         while(snakeBody.length > 0){
           snakeBody.pop()
         }
@@ -429,7 +487,7 @@ if (snakeX == Xpos && snakeY == Ypos && isTreasure && !isThorn && !isFakeTreasur
       velocityX = 0;
       velocityY = 0;
       snakeX = 560;
-      snakeY = 280;
+      snakeY = 280; 
       }  else if (snakeX == portalX2 && snakeY == portalY2 && room == 2){
         room = 1;
         while(snakeBody.length > 0){
@@ -484,6 +542,7 @@ if (snakeX == Xpos && snakeY == Ypos && isTreasure && !isThorn && !isFakeTreasur
        if (hp <= 0.5){
         hp = 0
         gameOver = true
+        deathReason = "Succumbed to poison"
        } else {
         hp = 1
        }
@@ -503,7 +562,7 @@ if (snakeX == Xpos && snakeY == Ypos && isTreasure && !isThorn && !isFakeTreasur
       const differencetwo= Math.abs(blackHoleY-snakeY);
       if(difference<Epsilon && differencetwo<Epsilon && room == 1){
         gameOver = true;
-        alert('Avoid the black hole.')
+       deathReason = "Touched black hole"
       }
       async function goldThing(){
         mult = 2;
@@ -527,7 +586,7 @@ if (snakeX == Xpos && snakeY == Ypos && isTreasure && !isThorn && !isFakeTreasur
         gE("score").innerHTML = 'Score: ' + score;
         placeGrape();
         placeMiniGrape()
-        setTimeout(()=>{grapePopped = false}, 4000)
+        setTimeout(()=>{miniGrapes.oneAlive = false; miniGrapes.twoAlive = false; miniGrapes.threeAlive = false; miniGrapes.fourAlive = false}, 4000)
  
         
       }
@@ -536,43 +595,52 @@ let wallY = wallArray[1]
 if (grapeX == wallX && wallY == grapeY){
   placeGrape()
 }
-if (grapePopped == true){
+if (miniGrapes.oneAlive == true){
   context.fillStyle = "purple"
   context.fillRect(miniGrapes.oneX, miniGrapes.oneY, blockSize/1.5, blockSize/1.5)
-  context.fillRect(miniGrapes.twoX, miniGrapes.twoY, blockSize/1.5, blockSize/1.5)
-  context.fillRect(miniGrapes.threeX, miniGrapes.threeY, blockSize/1.5, blockSize/1.5)
-  context.fillRect(miniGrapes.fourX, miniGrapes.fourY, blockSize/1.5, blockSize/1.5)
-} else{
+} else {
   context.fillStyle = "rgba(0,0,0,0)"
   context.fillRect(miniGrapes.oneX, miniGrapes.oneY, blockSize/1.5, blockSize/1.5)
+}
+if (miniGrapes.twoAlive == true){
+  context.fillStyle = "purple"
   context.fillRect(miniGrapes.twoX, miniGrapes.twoY, blockSize/1.5, blockSize/1.5)
+} else {
+  context.fillStyle = "rgba(0,0,0,0)"
+  context.fillRect(miniGrapes.twoX, miniGrapes.twoY, blockSize/1.5, blockSize/1.5)
+}
+if (miniGrapes.threeAlive == true){
+  context.fillStyle = "purple"
   context.fillRect(miniGrapes.threeX, miniGrapes.threeY, blockSize/1.5, blockSize/1.5)
+} else {
+  context.fillStyle = "rgba(0,0,0,0)"
+  context.fillRect(miniGrapes.threeX, miniGrapes.threeY, blockSize/1.5, blockSize/1.5)
+}
+if (miniGrapes.fourAlive == true){
+  context.fillStyle = "purple"
+  context.fillRect(miniGrapes.fourX, miniGrapes.fourY, blockSize/1.5, blockSize/1.5)
+} else {
+  context.fillStyle = "rgba(0,0,0,0)"
   context.fillRect(miniGrapes.fourX, miniGrapes.fourY, blockSize/1.5, blockSize/1.5)
 }
-      if (snakeX == miniGrapes.oneX && snakeY == miniGrapes.oneY && room == 2 && grapePopped == true) {
+      if (snakeX == miniGrapes.oneX && snakeY == miniGrapes.oneY && room == 2 && miniGrapes.oneAlive == true) {
         score = score + 0.5
         gE("score").innerHTML = 'Score: ' + score;
-        context.fillStyle = "rgba(0,0,0,0)"
-        context.fillRect(miniGrapes.oneX, miniGrapes.oneY, blockSize/1.5, blockSize/1.5)
-      }
-      if (snakeX == miniGrapes.twoX && snakeY == miniGrapes.twoY && room == 2 && grapePopped == true) {
+  miniGrapes.oneAlive = false
+      } else if (snakeX == miniGrapes.twoX && snakeY == miniGrapes.twoY && room == 2 && miniGrapes.twoAlive == true) {
         score = score + 0.5
         gE("score").innerHTML = 'Score: ' + score;
-        context.fillStyle = "rgba(0,0,0,0)"
-        context.fillRect(miniGrapes.twoX, miniGrapes.twoY, blockSize/1.5, blockSize/1.5)
-      }
-      if (snakeX == miniGrapes.threeX && snakeY == miniGrapes.threeY && room == 2 && grapePopped == true) {
+  miniGrapes.twoAlive = false
+      } else   if (snakeX == miniGrapes.threeX && snakeY == miniGrapes.threeY && room == 2 && miniGrapes.threeAlive == true) {
         score = score + 0.5
         gE("score").innerHTML = 'Score: ' + score;
-        context.fillStyle = "rgba(0,0,0,0)"
-        context.fillRect(miniGrapes.threeX, miniGrapes.threeY, blockSize/1.5, blockSize/1.5)
-      }
-      if (snakeX == miniGrapes.fourX && snakeY == miniGrapes.fourY && room == 2 && grapePopped == true) {
+  miniGrapes.threeAlive = false
+      } else   if (snakeX == miniGrapes.fourX && snakeY == miniGrapes.fourY && room == 2 && miniGrapes.fourAlive == true) {
         score = score + 0.5
         gE("score").innerHTML = 'Score: ' + score;
-        context.fillStyle = "rgba(0,0,0,0)"
-        context.fillRect(miniGrapes.fourX, miniGrapes.fourY, blockSize/1.5, blockSize/1.5)
+  miniGrapes.fourAlive = false
       }
+
       for (let i = snakeBody.length - 1; i > 0; i--) {
         snakeBody[i] = snakeBody[i - 1];
       }
@@ -676,7 +744,10 @@ if (grapePopped == true){
       miniGrapes.fourY = Math.floor(Math.random() * rows) * blockSize;
     }
     function placeMiniGrape() {
-  grapePopped = true;
+      miniGrapes.oneAlive = true;
+      miniGrapes.twoAlive = true;
+      miniGrapes.threeAlive = true;
+      miniGrapes.fourAlive = true;
     }
     function placeFood() {
       //(0-1) * cols -> (0-19.9999) -> (0-19) * 25
@@ -692,12 +763,7 @@ if (grapePopped == true){
      neutronX =  Math.floor(Math.random() * cols) * blockSize;
      neutronY = Math.floor(Math.random() * rows) * blockSize;
     }
-    function setPortals(){
-      portalX = 580;
-      portalY = 280;
-      portalX2 = 580;
-      portalY2 = 280;
-    }
+ 
     function placePoison() {
       poisonX = Math.floor(Math.random() * cols) * blockSize;
       poisonY = Math.floor(Math.random() * rows) * blockSize;
@@ -714,7 +780,6 @@ if (grapePopped == true){
     function reset(){
     placeGold();
     placePoison();
-    setPortals();
     Neutron();
     placeFood();
     appleChoose = Math.round(Math.random() * 1)
