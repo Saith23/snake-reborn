@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" ,="" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="/favicon.gif" type="image/gif"/>
+    <link rel="icon" href="favicon.gif" type="image/gif"/>
      <meta name="application-name" content="snek">
     <meta name="description" content="goofy ahh snake">
     <title>Snek</title>
@@ -12,29 +12,39 @@
   </head>
   <body>
     <div id="start" class="center">
-      <p id="escape"></p>
-      <h1 id="title">Snek</h1>
+    
+      <h1>Snek</h1>
       <button id="startgame" onclick="checkForMode()">Begin</button>
+      <button id="cl" onclick="window.location.href='https://saith23.github.io/snek/Changelog/changelog.html'">
+        Changelog
+        </button>
       <button id="mode" onclick="switchMode()"><span>Normal</span></button>
+      
     </div>
     <div id="thing1" style="display: none;">
+  
     <p id="score">Score: 0</p>
     <p id="health">Health: 3</p>
     <p id="bestscore" class="extra">Personal Best: 0</p>
     <p id="mult" class="extra">Multiplier: 1</p>
     <p id="room">Undefined</p>
-    <button id="gameover" onclick="restart()">
-    Play Again
-    </button>
-    <button id="cl" onclick="window.location.href='https://saith23.github.io/snek/Changelog/changelog.html'">
-      Changelog
-      </button>
+    <p id="escape" style="color: black;"></p>
+    
+
+  
       <button id="reset" onclick="localStorage.highScore = 0;">Reset Highscore</button>
       <button onclick="extraInfo()" id="info">More Info</button>
     </div>
+    <div id="gameover" class="center">
+      <h1>Game Over</h1>
+      <p id="reason"></p>
+      <button id="restartgame">Try again</button>
+      <button id="restartweb" onclick="restart()">Main menu</button>
+    </div>
     <canvas id="board" height="700" width="600" style="display:none;"></canvas>
 <script>
-var mode = 1;
+ 
+ var mode = 1;
 localStorage.setItem('hasStarted', false);
 localStorage.setItem('mode', mode);
 setInterval(()=>{localStorage.mode = mode}, 10);
